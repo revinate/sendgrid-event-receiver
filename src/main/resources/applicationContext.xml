@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-http="http://www.springframework.org/schema/integration/http"
+       xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration.xsd
+        http://www.springframework.org/schema/integration/http
+        http://www.springframework.org/schema/integration/http/spring-integration-http.xsd
+        http://www.springframework.org/schema/integration/amqp
+        http://www.springframework.org/schema/integration/amqp/spring-integration-amqp.xsd
+        http://www.springframework.org/schema/rabbit
+        http://www.springframework.org/schema/rabbit/spring-rabbit.xsd">
+
+  <int-http:inbound-channel-adapter
+      id="sendGridEventWebhookInboundAdapter"
+      channel="sendGridEventWebhookChannel"
+      path="/interface/sendgrid/{senderId}"
+      supported-methods="POST">
+    <int-http:header name="senderId" expression="#pathVariables['senderId']"/>
+  </int-http:inbound-channel-adapter>
+
+  <int:channel id="sendGridEventWebhookChannel"/>
+
+  <int:chain id="sendGridEventWebhookChain"
+             input-channel="sendGridEventWebhookChannel">
+    <int:header-enricher>
+      <int:header name="contentType" expression="headers['content-type']"/>
+      <int:header name="receiveTimestamp" expression="T(System).currentTimeMillis()"/>
+    </int:header-enricher>
+
+    <int:header-filter header-names="content-type,content-length,authorization,http_userPrincipal"/>
+
+    <int-amqp:outbound-channel-adapter
+        amqp-template="rabbitTemplate"
+        exchange-name="${amqp.exchange.sendgrid-event}"
+        routing-key-expression="headers['senderId']"
+        mapped-request-headers="*"/>
+  </int:chain>
+
+  <rabbit:topic-exchange name="${amqp.exchange.sendgrid-event}"/>
+</beans>

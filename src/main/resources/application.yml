@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: sendgrid-event-receiver
+  rabbitmq:
+    addresses: localhost:5672
+    username: rabbit
+    password: r@bb1t
+
+security:
+  user:
+    name: admin
+    password: admin
+  users:
+    sendgrid:
+      name: sendgrid
+      password: sendgrid
+
+server:
+  tomcat:
+    basedir: /tmp/sendgrid-event-receiver/tomcat
+    accesslog:
+      enabled: true
+
+amqp:
+  exchange:
+    sendgrid-event: sendgrid.event.tx

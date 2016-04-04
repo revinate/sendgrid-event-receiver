@@ -1,0 +1,61 @@
+buildscript {
+    ext {
+        springBootVersion = '1.3.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'spring-boot' 
+
+jar {
+    baseName = 'sendgrid-event-receiver'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-amqp')
+    compile('org.springframework.boot:spring-boot-starter-integration')
+    compile('org.springframework.integration:spring-integration-amqp')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+bootRun {
+    if (project.hasProperty('args')) {
+        args project.args.split('\\s+')
+    }
+}
+
+task startDependencies(type: Exec) {
+    commandLine 'docker', 'run', '-d',
+            '--hostname', 'sendgrid-rabbit',
+            '--name', 'sendgrid-rabbit',
+            '-p', '5672:5672',
+            '-p', '15672:15672',
+            '-e', 'RABBITMQ_ERLANG_COOKIE=cookie',
+            '-e', 'RABBITMQ_DEFAULT_USER=rabbit',
+            '-e', 'RABBITMQ_DEFAULT_PASS=r@bb1t',
+            'rabbitmq:3-management'
+}
+
+task stopDependencies(type: Exec) {
+    commandLine 'docker', 'rm', '-f', 'sendgrid-rabbit'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.9'
+}
