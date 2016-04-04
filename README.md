@@ -28,7 +28,7 @@ If the hostname of the Docker host is not localhost (e.g. if using Docker Machin
 the configured RabbitMQ address in the application needs to be changed:
 
 ```
-$ ./gradlew bootRun -Pargs="--spring.rabbitmq.addresses=<hostname>:5672
+$ ./gradlew bootRun -Pargs="--spring.rabbitmq.addresses=<hostname>:5672"
 ```
 
 Where `<hostname>` is e.g. the Docker Machine IP.
