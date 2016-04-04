@@ -8,9 +8,25 @@ them to RabbitMQ.
 * Java 1.8
 * Docker
 
-## Building and running
+## Building
 
-This application can be built and run using the included Gradle wrapper.
+This application can be built using the included Gradle wrapper.
+
+To build the runnable Jar:
+
+```
+$ ./gradlew build
+```
+
+Once the Jar is built, a Docker image for the application can also be built:
+
+```
+$ docker build -t sendgrid-event-receiver .
+```
+
+## Running and testing
+
+The Gradle wrapper can also be used to run the application locally.
 
 First, start the RabbitMQ Docker container:
 

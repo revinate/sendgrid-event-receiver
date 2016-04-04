@@ -1,0 +1,3 @@
+**/*
+!build/libs/sendgrid-event-receiver.jar
+!docker-entrypoint.sh
