@@ -1,4 +1,4 @@
-FROM java:8
+FROM java:8-alpine
 
 EXPOSE 8080
 
